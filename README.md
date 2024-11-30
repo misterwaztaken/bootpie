@@ -1,8 +1,11 @@
 > if you haven't realized already bootpie requires root to run on your device
 > 
-> make sure magisk allows adb to access root or it will not be able to patch
+> make sure magisk allows adb root access or it will not be able to patch
 > 
-> this requires use of a modified version of SamFirm named [SamFirm Reborn]("https://github.com/ivanmeler/SamFirm_Reborn/releases/tag/0.3.6.8") which will be used to find firmware files for patching
+> this requires use of a modified version of SamFirm named [SamFirm Reborn]("https://github.com/ivanmeler/SamFirm_Reborn/releases/tag/0.3.6.8") which will be used to find and download firmware files for patching
+> 
+> still a work in progress, don't expect this to work
+
 
 # bootpie
 

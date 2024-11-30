@@ -29,6 +29,32 @@ def list_connected_devices():
 
     return devices
 
+def get_imei(device_id):
+    """Retrieve the IMEI."""
+    # Restart adb in root mode
+    run_adb_command("adb root")
+
+    # Execute the service call command
+    command = f"adb -s {device_id} shell service call iphonesubinfo 1 s16 com.android.shell"
+    output, error = run_adb_command(command)
+    if error:
+        print(f"Error retrieving IMEI: {error}")
+        return None
+
+    # Parse the output: extract digits from hex-encoded response
+    imei = "".join(
+        line.split("'")[-2]
+        for line in output.splitlines()
+        if "'" in line
+    )
+    imei = "".join(filter(str.isdigit, imei))
+    
+    if len(imei) != 15:  # IMEI should be 15 digits long
+        print("Failed to parse IMEI correctly.")
+        return None
+
+    return imei
+
 def get_csc_code(device_id):
     """Retrieve the CSC code by reading /efs/imei/omcnw_code.dat."""
     run_adb_command(f"adb root")
@@ -61,22 +87,23 @@ def fetch_latest_firmware(csc, model):
         print(f"Error fetching firmware information: {e}")
         return None
 
-def download_firmware(csc, model, firmware_version):
+def download_firmware(csc, model, firmware_version, imei):
     """Download the firmware using SamFirm."""
     try:
         # Create the assets folder if it doesn't exist
-        assets_dir = "./assets/"
-        os.makedirs(assets_dir, exist_ok=True)
+        assets_dir = ".\\assets\\"
+        firmware_dir = f".\\assets\\firmware\\{model}\\"
+        # os.makedirs(assets_dir, exist_ok=True)
         
         # Install samloader dynamically
-        print("Cloning SamFirm...")
-        os.makedirs("./assets/samfirm/", exist_ok=True)
-        subprocess.run("./get-samfirm-release.ps1", shell=True, check=True)
+        # print("Cloning SamFirm...")
+        # os.makedirs(".\\assets\\samfirm\\", exist_ok=True)
+        # subprocess.run(".\\get-samfirm-release.ps1", shell=True, check=True)
 
         # Download the firmware
         print(f"Downloading firmware for {model}, CSC {csc}, version {firmware_version}...")
         subprocess.run(
-            f"samloader download -m {model} -r {csc} -v {firmware_version} -o {assets_dir}",
+            f".\\assets\\samfirm\\SamFirm.exe -model {model} -region {csc} -imei {imei} -folder {firmware_dir} -autodecrypt -nozip",
             shell=True,
             check=True
         )
@@ -115,6 +142,13 @@ def main():
         return
     print(f"CSC Code: {csc_code}")
 
+    # Get IMEI
+    imei = get_imei(selected_device)
+    if not imei:
+        print("Could not retrieve IMEI.")
+        return
+    print(f"IMEI: {imei}")
+
     # Get device model
     model, error = run_adb_command(f"adb -s {selected_device} shell getprop ro.product.model")
     if error or not model:
@@ -132,7 +166,7 @@ def main():
     print(f"Latest Firmware Build: {latest_build}")
 
     # Download firmware
-    download_firmware(csc_code, model, latest_build)
+    download_firmware(csc_code, model, latest_build, imei)
 
 if __name__ == "__main__":
     main()

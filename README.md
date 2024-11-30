@@ -2,13 +2,13 @@
 > 
 > make sure magisk allows adb to access root or it will not be able to patch
 > 
-> this requires use of samfirm which will be used to find firmware files for patching
+> this requires use of a modified version of SamFirm named [SamFirm Reborn]("https://github.com/ivanmeler/SamFirm_Reborn/releases/tag/0.3.6.8") which will be used to find firmware files for patching
 
 # bootpie
 
-a work-in-progress python utility for processing, editing, compressing and patching (hiding) the unofficial firmware warning for Samsung devices with non-stock operating systems (ROMs and whatnot))
+a work-in-progress python utility for processing, editing, compressing and patching (hiding) the unofficial firmware warning for Samsung devices with non-stock operating systems (ROMs and whatnot)
 
-## how it'll work
+## how it will work
 - bootpie will find the latest firmware version for your device automatically (on a website through a proxy) and also will automatically find up_param in the device's storage.
 - it will then proceed with downloading the firmware file to it's asset folder, and unpack it into another folder in the same directory
 - it will keep unpacking till it gets to the up_param file, it will unpack that

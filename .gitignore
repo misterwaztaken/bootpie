@@ -1,0 +1,2 @@
+# cleans assets/firmware/ so that there's not like 79 gb worth of files here for no reason
+/assets/firmware/**
